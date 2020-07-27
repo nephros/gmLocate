@@ -31,14 +31,16 @@
 #include "filesmodel.h"
 //QVector<QString>  FilesModel::backing;// = "";//<< "sea cow" << "platypus" << "axolotl" << "quokka" << "pitahui" << "jerboa";
 //int FilesModel::counter = 1;
+
+/*
 FilesModel::FilesModel(QObject *parent) :
     QAbstractListModel(parent)
 {
 
     backing << "sea cow" << "platypus" << "axolotl" << "quokka" << "pitahui" << "jerboa";
-//    counter++;
+    //    counter++;
 }
-
+*/
 
 
 QHash<int, QByteArray> FilesModel::roleNames() const {
@@ -48,7 +50,7 @@ QHash<int, QByteArray> FilesModel::roleNames() const {
 }
 
 int FilesModel::getsMyCounter() {
-    return -1;
+    return lcount;
 }
 
 QVariant FilesModel::data(const QModelIndex &index, int role) const {
@@ -81,44 +83,87 @@ void FilesModel::activate(const int i) {
     backing.insert(0, value);
     endInsertRows();
 }
+void FilesModel::remove(const int i) {
+    if(i < 0 || i >= backing.size()) {
+        return;
+    }
+    backing.erase(backing.begin() + i);
+}
 void FilesModel::swap2top(const int i) {
     if(i < 1 || i >= backing.size()) {
         return;
     }
-
-
-    // Remove the value from the old location.
-    beginMoveRows(QModelIndex(), i, i,QModelIndex(),0);
+  //  beginMoveRows(QModelIndex(), i, i,QModelIndex(),0);
     backing.move(i,0);
-    endMoveRows();
+   // endMoveRows();
 
 }
-int FilesModel::updateDb() {
+QString FilesModel::diskFree() {
+    QStringList args;
+    QString line = "";
+    QString lines = "";
     QProcess process;
-    QStringList params;
-    int count = 0;
-    process.setWorkingDirectory("/home/nemo");
-    process.start("updatedb",params);// . -name \"" + s + "*\"");
-    process.waitForFinished(3000); // will wait forever(-1) or msec until finished
-
+    args << "-h";
+    process.start("/bin/df", args);
+    process.waitForFinished(3000);
     //QString stdout = process.readAllStandardOutput();
-    QString stderr;// = process.readAllStandardError();
+    QString stderr = process.readAllStandardError();
     while (process.canReadLine()) {
-        QString line = process.readLine();
-        this->appends(line);
-        count++;
+        line = process.readLine();
+        if (!line.contains("tmpfs",Qt::CaseInsensitive)) {
+            lines += process.readLine();
+        }
     }
-    this->lcount = count;
-    QString pwd = process.workingDirectory();
-    //this->appends(line);
-    return count;//stdout.length();
+    //line.truncate(16);
+
+    return lines;
+
 }
-int FilesModel::locate(QString s) {
+
+QString FilesModel::updateDb(bool doUpdate) {
+    //args << "-c" <<  "%y" << "/var/cache/harbour-mlocate.db";
+    QProcess process;
+    QString stderr;
+    QStringList args;
+    bool gotResult = false;
+    QString retline = "Last updateDB";
+    QString line;
+    if (doUpdate) {
+        process.setWorkingDirectory("/home/nemo");
+        process.start("updatedb",args);// . -name \"" + s + "*\"");
+        process.waitForFinished(3000); // will wait forever(-1) or msec until finished
+    }
+    //args  << "-c" <<  "%y" << "/var/cache/harbour-mlocate.db";
+    args  << "-c" <<  "%y" << "/var/cache/pk-zypp-cache";
+    process.start("/usr/bin/stat",args);
+    process.waitForFinished(3000);
+    //QString stdout = process.readAllStandardOutput();
+    while (process.canReadLine()) {
+        line += ": " + process.readLine();
+        gotResult = true;
+    }
+    line.truncate(18);
+    if (!gotResult) {
+        retline = process.readAllStandardError();
+    } else {
+        retline += line;
+    }
+
+    return retline;
+}
+int FilesModel::locate(QString s, bool ignoreCase ) {
     QProcess process;
     QStringList params;
     int count = 0;
+    s += "*";
     //s = "'*" + s + "*'";
-    params << "." << "-name" << s;
+    params << ".";
+    if (ignoreCase ) {
+        params << "-iname";
+    } else {
+        params << "-name";
+    }
+    params << s ;
     // process.setArguments(params);
     process.setWorkingDirectory("/home/nemo");
     process.start("find",params);// . -name \"" + s + "*\"");
@@ -126,13 +171,19 @@ int FilesModel::locate(QString s) {
 
     //QString stdout = process.readAllStandardOutput();
     QString stderr;// = process.readAllStandardError();
+    backing.clear();
     while (process.canReadLine()) {
         QString line = process.readLine();
-        this->appends(line);
+        //this->appends(line);
+        backing << line;
         count++;
     }
     this->lcount = count;
     QString pwd = process.workingDirectory();
     //this->appends(line);
     return count;//stdout.length();
+}
+// für qml model dataModel
+QStringList FilesModel::getFileList() {
+    return backing;
 }

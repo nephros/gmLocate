@@ -5,18 +5,16 @@ CoverBackground {
     Label {
         id: label
         anchors.centerIn: parent
-        text: qsTr("My Cover")
+        text: qsTr("gmLocate")
     }
 
     CoverActionList {
         id: coverAction
 
         CoverAction {
-            iconSource: "image://theme/icon-cover-next"
+            iconSource: "image://theme/icon-l-document"
         }
 
-        CoverAction {
-            iconSource: "image://theme/icon-cover-pause"
-        }
+
     }
 }

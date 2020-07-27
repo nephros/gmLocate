@@ -6,6 +6,7 @@
 #include <QtQuick>
 #include <QScopedPointer>
 #include "filesmodel.h"
+
 int main(int argc, char *argv[])
 {
     // SailfishApp::main() will display "qml/gmLocate.qml", if you need more
@@ -18,15 +19,20 @@ int main(int argc, char *argv[])
     //
     // To display the view, call "show()" (will show fullscreen on device).
 
-   //// return SailfishApp::main(argc, argv);
+    //// return SailfishApp::main(argc, argv);
     // Set up qml engine.
     QScopedPointer<QGuiApplication> app(SailfishApp::application(argc, argv));
     QScopedPointer<QQuickView> v(SailfishApp::createView());
 
     // If you wish to publish your app on the Jolla harbour, follow
     // https://harbour.jolla.com/faq#5.3.0 about naming own QML modules.
-    qmlRegisterType<FilesModel>("com.gmLocate", 1, 0, "FilesModel");
+    qmlRegisterType<FilesModel>("FilesModel", 1, 0, "FilesModel");
 
+////     obj_fmodel in app global verfügbar machen
+FilesModel obj_fmodel;
+    v->rootContext()->setContextProperty("sharedfmodel", &obj_fmodel);
+
+    //qmlRegisterType<Processs>("Processs", 1, 0, "Processs");
     // Start the application.
     v->setSource(SailfishApp::pathTo("qml/gmLocate.qml"));
     v->show();
