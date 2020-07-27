@@ -1,2 +1,2 @@
 # gmLocate
-Sailfish GUI fpr mlocate
+Sailfish GUI for mlocate
