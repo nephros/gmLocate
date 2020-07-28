@@ -22,7 +22,7 @@
 <context>
     <name>SecondPage</name>
     <message>
-        <source>located files: </source>
+        <source>located files(Limit: 1000): </source>
         <translation type="unfinished"></translation>
     </message>
 </context>

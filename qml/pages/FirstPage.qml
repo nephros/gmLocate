@@ -21,10 +21,10 @@ Page {
 
         // Tell SilicaFlickable the height of its content.
         contentHeight: column.height
-       //// FilesModel {
-       ////     id: fmodel
-            //onReadyRead: firstLabel.text = readAll()
-       //// }
+        //// FilesModel {
+        ////     id: fmodel
+        //onReadyRead: firstLabel.text = readAll()
+        //// }
         // Place our content in a Column.  The PageHeader is always placed at the top
         // of the page, followed by our content.
         Column {
@@ -44,46 +44,73 @@ Page {
                 color: Theme.secondaryHighlightColor
                 font.pixelSize: Theme.fontSizeExtraSmall
                 padding: Theme.paddingSmall
+
             }
             Label {
-                id: idDBage
+                id: idDBSystemAge
                 anchors.horizontalCenter: parent.horizontalCenter
                 //x: Theme.horizontalPageMargin
                 ////text: fmodel.updateDb()
-                text: sharedfmodel.updateDb()
+                text: sharedfmodel.updateDb(false)
                 color: Theme.secondaryHighlightColor
                 font.pixelSize: Theme.fontSizeExtraSmall
             }
+            Label {
+                id: idDBUserAge
+                anchors.horizontalCenter: parent.horizontalCenter
+                //x: Theme.horizontalPageMargin
+                ////text: fmodel.updateDb()
+                text: sharedfmodel.updateDb(true)
+                color: Theme.secondaryHighlightColor
+                font.pixelSize: Theme.fontSizeExtraSmall
+                //margins: Theme.paddingLarge // wenns an kanten klebt
+            }
+
             ButtonLayout {
                 id: idButtons
                 Button {
-                    text: "updateDB"
+                    text: "update User DB"
                     //anchors.horizontalCenter: parent.horizontalCenter
                     onClicked: {
                         ///var/cache/locate/locatedb
                         //process.start("/bin/cat", [ "/proc/uptime" ]);
                         //process.start("df", [ "-h" ]);
-                       idDBage.text = sharedfmodel.updateDb(true)
+                        idDBUserAge.text = sharedfmodel.updateDb(true, true)
                     }
                 }
-                Button {
-                    text: "mlocate"
+                /*Button {
+                    text: "locate (User DB)"
                     ButtonLayout.newLine: true
                     enabled: file2find.text.length > 2 ? true : false
                     //   anchors.horizontalCenter: parent.horizontalCenter
                     onClicked: {
-                        sharedfmodel.locate(file2find.text, ignoreCaseSwitch.checked)
+                        sharedfmodel.ulocate(file2find.text, ignoreCaseSwitch.checked)
+                        pageStack.push(Qt.resolvedUrl("SecondPage.qml"))
+                    }
+                }*/
+
+                Button {
+                    text: " locate "
+                    ButtonLayout.newLine: true
+                    enabled: file2find.text.length > 2 ? true : false
+                    //   anchors.horizontalCenter: parent.horizontalCenter
+                    onClicked: {
+                        sharedfmodel.locate(file2find.text, useUserDBSwitch.checked, ignoreCaseSwitch.checked)
                         pageStack.push(Qt.resolvedUrl("SecondPage.qml"))
                     }
                 }
-
-
+            }
+            TextSwitch {
+                id: useUserDBSwitch
+                checked: false
+                text: "use User DB"
+                description: useUserDBSwitch.checked ? "using User DB" : "using System DB"
             }
             TextSwitch {
                 id: ignoreCaseSwitch
                 checked: true
-                text: ignoreCaseSwitch.checked ? "ignoring case" : "case sensitive"
-                description: "ignore case or not"
+                text: "ignore case"
+                description: ignoreCaseSwitch.checked ? "ignoring case" : "case sensitive"
             }
             TextField {
                 id: file2find

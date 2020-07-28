@@ -1,6 +1,6 @@
 Name: gmLocate
 Summary: Sailfish gmLocate
-Version: 0.1
+Version: 0.2
 Release: 1
 # The contents of the Group field should be one of the groups listed here:
 # https://github.com/mer-tools/spectacle/blob/master/data/GROUPS
@@ -12,7 +12,7 @@ License: LICENSE
 Sources:
 - '%{name}-%{version}.tar.bz2'
 Description: |
-  Short description of my Sailfish OS Application
+  GUI for mlocate (needs do be installed)
 Configure: none
 Builder: qmake5
 

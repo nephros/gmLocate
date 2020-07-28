@@ -8,30 +8,33 @@ Page {
     SilicaListView {
         id: listView
         model: sharedfmodel.getFileList()
+
         /*
             FilesModel {
             id: fmodel
         }*/
         anchors.fill: parent
         header: PageHeader {
-            title: qsTr("located files: " ) + sharedfmodel.getsMyCounter()
+            title: qsTr("located files(Limit: 1000): " ) + sharedfmodel.getsMyCounter()
         }
         delegate: ListItem {
             id: listEntry
-            contentHeight:Theme.fontSizeSmall * 1.4
+
+            //contentHeight:Theme.fontSizeSmall * 1.4
             Label {
+                width: parent.width - Theme.fontSizeSmall * 2
+                wrapMode: Text.WrapAnywhere
                 x: Theme.horizontalPageMargin
                 // modelData ist qml definition
                 text:  modelData  //qsTr("Item") + " " + index
                 color: listEntry.highlighted ? Theme.highlightColor : Theme.primaryColor
-                font.pixelSize: Theme.fontSizeExtraSmall
+                //font.pixelSize: Theme.fontSizeExtraSmall
                 padding: Theme.paddingSmall
-
+//height: contentHeight
             }
             onClicked: {
                 sharedfmodel.swap2top(index)
                 console.log("Clicked " + index)
-                //listView.model = 1;
                 //update listView Ansatz mit BeginInsertRows unfug da performance inrelevat
                 listView.model = sharedfmodel.getFileList()
                 //listView.forceLayout()// funktioniert nicht
@@ -59,6 +62,8 @@ Page {
                     }
                 }
             }
+            VerticalScrollDecorator {}
+            //HorizontalScrollDecorator {}
         }
     }
 }

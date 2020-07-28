@@ -9,7 +9,7 @@ Name:       gmLocate
 # << macros
 
 Summary:    Sailfish gmLocate
-Version:    0.1
+Version:    0.2
 Release:    1
 Group:      Qt/Qt
 License:    LICENSE
@@ -24,7 +24,7 @@ BuildRequires:  pkgconfig(Qt5Quick)
 BuildRequires:  desktop-file-utils
 
 %description
-Short description of my Sailfish OS Application
+GUI for mlocate (needs do be installed)
 
 
 %prep

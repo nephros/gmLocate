@@ -32,15 +32,16 @@
 //QVector<QString>  FilesModel::backing;// = "";//<< "sea cow" << "platypus" << "axolotl" << "quokka" << "pitahui" << "jerboa";
 //int FilesModel::counter = 1;
 
-/*
+
 FilesModel::FilesModel(QObject *parent) :
     QAbstractListModel(parent)
 {
-
-    backing << "sea cow" << "platypus" << "axolotl" << "quokka" << "pitahui" << "jerboa";
+    systemDB = "/var/cache/harbour-mlocate.db";
+    userDB = "locateDB.db";
+    //   backing << "sea cow" << "platypus" << "axolotl" << "quokka" << "pitahui" << "jerboa";
     //    counter++;
 }
-*/
+
 
 
 QHash<int, QByteArray> FilesModel::roleNames() const {
@@ -93,9 +94,9 @@ void FilesModel::swap2top(const int i) {
     if(i < 1 || i >= backing.size()) {
         return;
     }
-  //  beginMoveRows(QModelIndex(), i, i,QModelIndex(),0);
+    //  beginMoveRows(QModelIndex(), i, i,QModelIndex(),0);
     backing.move(i,0);
-   // endMoveRows();
+    // endMoveRows();
 
 }
 QString FilesModel::diskFree() {
@@ -110,9 +111,9 @@ QString FilesModel::diskFree() {
     QString stderr = process.readAllStandardError();
     while (process.canReadLine()) {
         line = process.readLine();
-        if (!line.contains("tmpfs",Qt::CaseInsensitive)) {
-            lines += process.readLine();
-        }
+        // if (!line.contains("tmpfs",Qt::CaseInsensitive)) {
+        lines += process.readLine();
+        //}
     }
     //line.truncate(16);
 
@@ -120,23 +121,36 @@ QString FilesModel::diskFree() {
 
 }
 
-QString FilesModel::updateDb(bool doUpdate) {
+QString FilesModel::updateDb(bool useUserDB, bool doUpdate) {
     //args << "-c" <<  "%y" << "/var/cache/harbour-mlocate.db";
+    //updatedb -o locateDB.db
     QProcess process;
+    process.setWorkingDirectory("/home/nemo");
     QString stderr;
     QStringList args;
     bool gotResult = false;
-    QString retline = "Last updateDB";
+    QString retline;
     QString line;
     if (doUpdate) {
-        process.setWorkingDirectory("/home/nemo");
+       // process.setWorkingDirectory("/home/nemo");
+        if (useUserDB) {
+            args << "-o" << userDB;
+        }
         process.start("updatedb",args);// . -name \"" + s + "*\"");
-        process.waitForFinished(3000); // will wait forever(-1) or msec until finished
+        process.waitForFinished(30000); // will wait forever(-1) or msec until finished
     }
-    //args  << "-c" <<  "%y" << "/var/cache/harbour-mlocate.db";
-    args  << "-c" <<  "%y" << "/var/cache/pk-zypp-cache";
+    args.clear();
+    args  << "-c" <<  "%y";
+    if (useUserDB) {
+        args  << userDB;
+        retline = "Last updateDB USER";
+    } else {
+        args  << systemDB;
+        retline = "Last updateDB SYSTEM";
+    }
+    //args  << "-c" <<  "%y" << "/var/cache/pk-zypp-cache";
     process.start("/usr/bin/stat",args);
-    process.waitForFinished(3000);
+    process.waitForFinished(1000);
     //QString stdout = process.readAllStandardOutput();
     while (process.canReadLine()) {
         line += ": " + process.readLine();
@@ -145,41 +159,48 @@ QString FilesModel::updateDb(bool doUpdate) {
     line.truncate(18);
     if (!gotResult) {
         retline = process.readAllStandardError();
+        retline.remove(0, 26);
     } else {
         retline += line;
     }
-
+//retline = process.workingDirectory();
     return retline;
 }
-int FilesModel::locate(QString s, bool ignoreCase ) {
+int FilesModel::locate(QString s, bool useUserDB, bool ignoreCase  ) {
+    //locate -d locateDB.db
     QProcess process;
     QStringList params;
     int count = 0;
-    s += "*";
-    //s = "'*" + s + "*'";
-    params << ".";
     if (ignoreCase ) {
-        params << "-iname";
-    } else {
-        params << "-name";
+        params << "-i";
     }
-    params << s ;
+    if (useUserDB){
+        params << "-d" << userDB;
+    }
+    params << "-l" << "1000" << s ;
     // process.setArguments(params);
     process.setWorkingDirectory("/home/nemo");
-    process.start("find",params);// . -name \"" + s + "*\"");
+    process.start("/usr/bin/locate",params);// . -name \"" + s + "*\"");
     process.waitForFinished(3000); // will wait forever(-1) or msec until finished
 
     //QString stdout = process.readAllStandardOutput();
     QString stderr;// = process.readAllStandardError();
     backing.clear();
+   // backing.append(params);
     while (process.canReadLine()) {
         QString line = process.readLine();
         //this->appends(line);
         backing << line;
         count++;
     }
+    if (count == 0) {
+        backing << "***** Nothing found :-( ****----------------------------------------------------------------------------------/----------------------------------------------------------------------------------------------------------------------------";
+        backing << " " << " ";
+        backing << "mlocate installed?";
+        backing << "No Database?";
+        backing << " or try a less complex search...";
+    }
     this->lcount = count;
-    QString pwd = process.workingDirectory();
     //this->appends(line);
     return count;//stdout.length();
 }
