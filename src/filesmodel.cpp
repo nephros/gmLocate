@@ -200,6 +200,8 @@ int FilesModel::locate(QString s, bool useUserDB, bool ignoreCase  ) {
         backing << "No Database?";
         backing << " or try a less complex search...";
     }
+//backing.clear();
+//backing << "test.jpg" << "test2.jpg";
     this->lcount = count;
     //this->appends(line);
     return count;//stdout.length();
@@ -208,3 +210,13 @@ int FilesModel::locate(QString s, bool useUserDB, bool ignoreCase  ) {
 QStringList FilesModel::getFileList() {
     return backing;
 }
+
+bool FilesModel::execXdgOpen(QString filename) {
+    QProcess process;
+    QStringList params;
+    params << filename;
+    process.setWorkingDirectory("/home/nemo");
+    process.startDetached("/usr/bin/xdg-open",params);
+    return true;
+}
+

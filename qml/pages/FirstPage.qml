@@ -121,7 +121,7 @@ Page {
                 EnterKey.enabled: text.length > 2
                 EnterKey.iconSource: "image://theme/icon-m-enter-next"
                 EnterKey.onClicked: {
-                    sharedfmodel.locate(file2find.text , ignoreCaseSwitch.checked)
+                    sharedfmodel.locate(file2find.text, useUserDBSwitch.checked, ignoreCaseSwitch.checked)
                     pageStack.push(Qt.resolvedUrl("SecondPage.qml"))
                 }
             }

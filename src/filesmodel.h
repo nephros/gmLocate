@@ -32,6 +32,7 @@ public:
     Q_INVOKABLE QString updateDb(bool useUserDB, bool doUpdate = false);
     Q_INVOKABLE QStringList getFileList();
     Q_INVOKABLE void remove(const int i);
+    Q_INVOKABLE bool execXdgOpen(QString filename);
     int lcount = 0;
     enum DemoRoles {
         NameRole = Qt::UserRole + 1,

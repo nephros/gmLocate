@@ -26,11 +26,11 @@ Page {
                 wrapMode: Text.WrapAnywhere
                 x: Theme.horizontalPageMargin
                 // modelData ist qml definition
-                text:  modelData  //qsTr("Item") + " " + index
+                text:  index + ": " + modelData  //qsTr("Item") + " " + index
                 color: listEntry.highlighted ? Theme.highlightColor : Theme.primaryColor
                 //font.pixelSize: Theme.fontSizeExtraSmall
-                padding: Theme.paddingSmall
-//height: contentHeight
+                //padding: Theme.paddingSmall
+                //height: contentHeight
             }
             onClicked: {
                 sharedfmodel.swap2top(index)
@@ -40,7 +40,9 @@ Page {
                 //listView.forceLayout()// funktioniert nicht
             }
             menu: ContextMenu {
-
+                //you should prefer to use xdg-open /usr/share/applications/some-application.desktop to start applications properly.
+                //if designing UI you can use Qt.openUrlExternally("/usr/share/applications/some-application.desktop")
+                //in QML and QDesktopServices::openUrl("/usr/share/applications/some-application.desktop") in Qt.
                 MenuItem {
                     // implicitHeight: Theme.fontSizeExtraSmall * 1.2
                     text: "move to top"
@@ -48,6 +50,7 @@ Page {
                     onClicked: {
                         sharedfmodel.swap2top(index)
                         listView.model = sharedfmodel.getFileList()
+                        //                       listView.positionViewAtIndex(index)
                     }
                 }
                 MenuItem {
@@ -58,7 +61,20 @@ Page {
                         listEntry.remorseAction("Deleting", function() {
                             sharedfmodel.remove(index)
                             listView.model = sharedfmodel.getFileList()
+                            //      listView.positionViewAtIndex(index)
                         })
+                    }
+                }
+                MenuItem {
+                    //   implicitHeight: Theme.fontSizeExtraSmall * 1.2
+                    text: "OPEN " // + modelData //listView.currentItem.text
+
+                    onClicked: {
+                        //listEntry.remorseAction("opening", function() {
+                        //Qt.openUrlExternally("file://" + modelData)
+                        sharedfmodel.execXdgOpen(modelData);
+                        //QDesktopServices::openUrl(QUrl("http://developer.nokia.com"));
+                        // })
                     }
                 }
             }
