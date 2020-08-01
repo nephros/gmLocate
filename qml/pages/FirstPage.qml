@@ -35,7 +35,7 @@ Page {
             PageHeader {
                 title: qsTr("gmLocate")
             }
-            Label {
+            /* Label {
                 id: iddf
                 anchors.horizontalCenter: parent.horizontalCenter
                 //x: Theme.horizontalPageMargin
@@ -45,7 +45,7 @@ Page {
                 font.pixelSize: Theme.fontSizeExtraSmall
                 padding: Theme.paddingSmall
 
-            }
+            }*/
             Label {
                 id: idDBSystemAge
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -89,16 +89,7 @@ Page {
                     }
                 }*/
 
-                Button {
-                    text: " locate "
-                    ButtonLayout.newLine: true
-                    enabled: file2find.text.length > 2 ? true : false
-                    //   anchors.horizontalCenter: parent.horizontalCenter
-                    onClicked: {
-                        sharedfmodel.locate(file2find.text, useUserDBSwitch.checked, ignoreCaseSwitch.checked)
-                        pageStack.push(Qt.resolvedUrl("SecondPage.qml"))
-                    }
-                }
+
             }
             TextSwitch {
                 id: useUserDBSwitch
@@ -112,6 +103,24 @@ Page {
                 text: "ignore case"
                 description: ignoreCaseSwitch.checked ? "ignoring case" : "case sensitive"
             }
+            TextSwitch {
+                id: matchAllPatternsSwitch
+                checked: true
+                text: "match all Patterns"
+                description: matchAllPatternsSwitch.checked ? "must match all Patterns" : "must match only one Pattern"
+            }
+            TextSwitch {
+                id: useRegexSwitch
+                checked: false
+                text: "use eRegex"
+                description: useRegexSwitch.checked ? "using extended regular expression" : "using glob pattern"
+            }
+            TextSwitch {
+                id: existsSwitch
+                checked: false
+                text: "only currently exists"
+                description: existsSwitch.checked ? "chowing file only if realy exists" : "showing files in db"
+            }
             TextField {
                 id: file2find
                 placeholderText: "fillin file to find..."
@@ -121,8 +130,20 @@ Page {
                 EnterKey.enabled: text.length > 2
                 EnterKey.iconSource: "image://theme/icon-m-enter-next"
                 EnterKey.onClicked: {
-                    sharedfmodel.locate(file2find.text, useUserDBSwitch.checked, ignoreCaseSwitch.checked)
+                    sharedfmodel.locate(file2find.text, useUserDBSwitch.checked, ignoreCaseSwitch.checked, useRegexSwitch.checked,  existsSwitch.checked, matchAllPatternsSwitch.checked)
                     pageStack.push(Qt.resolvedUrl("SecondPage.qml"))
+                }
+            }
+            ButtonLayout {
+                Button {
+                    text: " locate "
+                    ButtonLayout.newLine: true
+                    enabled: file2find.text.length > 2 ? true : false
+                    //   anchors.horizontalCenter: parent.horizontalCenter
+                    onClicked: {
+                        sharedfmodel.locate(file2find.text, useUserDBSwitch.checked, ignoreCaseSwitch.checked, useRegexSwitch.checked, existsSwitch.checked, matchAllPatternsSwitch.checked )
+                        pageStack.push(Qt.resolvedUrl("SecondPage.qml"))
+                    }
                 }
             }
         }

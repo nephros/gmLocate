@@ -166,7 +166,7 @@ QString FilesModel::updateDb(bool useUserDB, bool doUpdate) {
 //retline = process.workingDirectory();
     return retline;
 }
-int FilesModel::locate(QString s, bool useUserDB, bool ignoreCase  ) {
+int FilesModel::locate(QString s, bool useUserDB, bool ignoreCase, bool useRegex, bool exists, bool useAllPatterns  ) {
     //locate -d locateDB.db
     QProcess process;
     QStringList params;
@@ -174,17 +174,29 @@ int FilesModel::locate(QString s, bool useUserDB, bool ignoreCase  ) {
     if (ignoreCase ) {
         params << "-i";
     }
+    if (useRegex) {
+       params << "--regex";
+    }
+    if (exists) {
+       params << "-e";
+    }
     if (useUserDB){
         params << "-d" << userDB;
     }
-    params << "-l" << "1000" << s ;
+    if (useAllPatterns){
+        params << "-A";
+    }
+
+    params << "-l" << "1000";
+    s.simplified();
+    params.append(s.split(' '));
     // process.setArguments(params);
     process.setWorkingDirectory("/home/nemo");
     process.start("/usr/bin/locate",params);// . -name \"" + s + "*\"");
-    process.waitForFinished(3000); // will wait forever(-1) or msec until finished
+    process.waitForFinished(-1); // will wait forever(-1) or msec until finished
 
     //QString stdout = process.readAllStandardOutput();
-    QString stderr;// = process.readAllStandardError();
+    QString stderr = process.readAllStandardError();
     backing.clear();
    // backing.append(params);
     while (process.canReadLine()) {
@@ -194,11 +206,11 @@ int FilesModel::locate(QString s, bool useUserDB, bool ignoreCase  ) {
         count++;
     }
     if (count == 0) {
-        backing << "***** Nothing found :-( ****----------------------------------------------------------------------------------/----------------------------------------------------------------------------------------------------------------------------";
-        backing << " " << " ";
-        backing << "mlocate installed?";
-        backing << "No Database?";
-        backing << " or try a less complex search...";
+        backing << "***** Nothing found :-( ";
+        backing << "mlocate installed? No Database?";
+        backing << "your search: ";
+        backing.append(params);
+        backing << stderr;
     }
 //backing.clear();
 //backing << "test.jpg" << "test2.jpg";
@@ -219,4 +231,12 @@ bool FilesModel::execXdgOpen(QString filename) {
     process.startDetached("/usr/bin/xdg-open",params);
     return true;
 }
+/*
+bool FilesModel::startFileBrowser(QString dir) {
+    dir.trimmed();
+    dir.truncate(dir.lastIndexOf("/"));
+    QProcessEnvironment qpe;
+    QString oldhome = qpe.value("HOME");
+    insert("HOME",dir);
+}*/
 

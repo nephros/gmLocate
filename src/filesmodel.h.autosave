@@ -2,6 +2,7 @@
 #define FILESMODEL_H
 #include <QAbstractListModel>
 #include <QProcess>
+#include <QProcessEnvironment>
 
 class FilesModel : public QAbstractListModel
 {
