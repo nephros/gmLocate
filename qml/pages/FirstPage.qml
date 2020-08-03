@@ -18,15 +18,8 @@ Page {
                 onClicked: pageStack.push(Qt.resolvedUrl("SecondPage.qml"))
             }
         }
-
         // Tell SilicaFlickable the height of its content.
         contentHeight: column.height
-        //// FilesModel {
-        ////     id: fmodel
-        //onReadyRead: firstLabel.text = readAll()
-        //// }
-        // Place our content in a Column.  The PageHeader is always placed at the top
-        // of the page, followed by our content.
         Column {
             id: column
 
@@ -49,8 +42,6 @@ Page {
             Label {
                 id: idDBSystemAge
                 anchors.horizontalCenter: parent.horizontalCenter
-                //x: Theme.horizontalPageMargin
-                ////text: fmodel.updateDb()
                 text: sharedfmodel.updateDb(false)
                 color: Theme.secondaryHighlightColor
                 font.pixelSize: Theme.fontSizeExtraSmall
@@ -58,8 +49,6 @@ Page {
             Label {
                 id: idDBUserAge
                 anchors.horizontalCenter: parent.horizontalCenter
-                //x: Theme.horizontalPageMargin
-                ////text: fmodel.updateDb()
                 text: sharedfmodel.updateDb(true)
                 color: Theme.secondaryHighlightColor
                 font.pixelSize: Theme.fontSizeExtraSmall
@@ -72,24 +61,9 @@ Page {
                     text: "update User DB"
                     //anchors.horizontalCenter: parent.horizontalCenter
                     onClicked: {
-                        ///var/cache/locate/locatedb
-                        //process.start("/bin/cat", [ "/proc/uptime" ]);
-                        //process.start("df", [ "-h" ]);
                         idDBUserAge.text = sharedfmodel.updateDb(true, true)
                     }
                 }
-                /*Button {
-                    text: "locate (User DB)"
-                    ButtonLayout.newLine: true
-                    enabled: file2find.text.length > 2 ? true : false
-                    //   anchors.horizontalCenter: parent.horizontalCenter
-                    onClicked: {
-                        sharedfmodel.ulocate(file2find.text, ignoreCaseSwitch.checked)
-                        pageStack.push(Qt.resolvedUrl("SecondPage.qml"))
-                    }
-                }*/
-
-
             }
             TextSwitch {
                 id: useUserDBSwitch
@@ -107,7 +81,7 @@ Page {
                 id: matchAllPatternsSwitch
                 checked: true
                 text: "match all Patterns"
-                description: matchAllPatternsSwitch.checked ? "must match all Patterns" : "must match only one Pattern"
+                description: matchAllPatternsSwitch.checked ? "matching all Patterns" : "matching only one the Patterns"
             }
             TextSwitch {
                 id: useRegexSwitch
@@ -123,7 +97,7 @@ Page {
             }
             TextField {
                 id: file2find
-                placeholderText: "fillin file to find..."
+                placeholderText: "fillin file to find... (min. 3 chars!"
                 label: "fillin file to find... (min. 3 chars!)"
                 width: parent.width
                 anchors.horizontalCenter: parent.horizontalCenter

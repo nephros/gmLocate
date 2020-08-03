@@ -7,14 +7,10 @@ CoverBackground {
         anchors.centerIn: parent
         text: qsTr("gmLocate")
     }
-
     CoverActionList {
         id: coverAction
-
         CoverAction {
             iconSource: "image://theme/icon-l-document"
         }
-
-
     }
 }
