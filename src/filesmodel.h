@@ -2,7 +2,10 @@
 #define FILESMODEL_H
 #include <QAbstractListModel>
 #include <QProcess>
-
+#include <QProcessEnvironment>
+#include <QFileInfo>
+#include <QDebug>
+#include <QtGlobal>
 class FilesModel : public QAbstractListModel
 {
     Q_OBJECT
@@ -33,6 +36,7 @@ public:
     Q_INVOKABLE QStringList getFileList();
     Q_INVOKABLE void remove(const int i);
     Q_INVOKABLE bool execXdgOpen(QString filename);
+    Q_INVOKABLE bool startFileBrowser(QString dir);
     int lcount = 0;
     enum DemoRoles {
         NameRole = Qt::UserRole + 1,

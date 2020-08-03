@@ -1,32 +1,4 @@
-/*
-  Copyright (C) 2015 Jolla Ltd.
-  Contact: Jussi Pakkanen <jussi.pakkanen@jollamobile.com>
-  All rights reserved.
 
-  You may use this file under the terms of BSD license as follows:
-
-  Redistribution and use in source and binary forms, with or without
-  modification, are permitted provided that the following conditions are met:
-    * Redistributions of source code must retain the above copyright
-      notice, this list of conditions and the following disclaimer.
-    * Redistributions in binary form must reproduce the above copyright
-      notice, this list of conditions and the following disclaimer in the
-      documentation and/or other materials provided with the distribution.
-    * Neither the name of the Jolla Ltd nor the
-      names of its contributors may be used to endorse or promote products
-      derived from this software without specific prior written permission.
-
-  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR CONTRIBUTORS BE LIABLE FOR
-  ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
 
 #include "filesmodel.h"
 //QVector<QString>  FilesModel::backing;// = "";//<< "sea cow" << "platypus" << "axolotl" << "quokka" << "pitahui" << "jerboa";
@@ -132,7 +104,7 @@ QString FilesModel::updateDb(bool useUserDB, bool doUpdate) {
     QString retline;
     QString line;
     if (doUpdate) {
-       // process.setWorkingDirectory("/home/nemo");
+        // process.setWorkingDirectory("/home/nemo");
         if (useUserDB) {
             args << "-o" << userDB;
         }
@@ -163,7 +135,7 @@ QString FilesModel::updateDb(bool useUserDB, bool doUpdate) {
     } else {
         retline += line;
     }
-//retline = process.workingDirectory();
+    //retline = process.workingDirectory();
     return retline;
 }
 int FilesModel::locate(QString s, bool useUserDB, bool ignoreCase, bool useRegex, bool exists, bool useAllPatterns  ) {
@@ -175,10 +147,10 @@ int FilesModel::locate(QString s, bool useUserDB, bool ignoreCase, bool useRegex
         params << "-i";
     }
     if (useRegex) {
-       params << "--regex";
+        params << "--regex";
     }
     if (exists) {
-       params << "-e";
+        params << "-e";
     }
     if (useUserDB){
         params << "-d" << userDB;
@@ -198,7 +170,7 @@ int FilesModel::locate(QString s, bool useUserDB, bool ignoreCase, bool useRegex
     //QString stdout = process.readAllStandardOutput();
     QString stderr = process.readAllStandardError();
     backing.clear();
-   // backing.append(params);
+    // backing.append(params);
     while (process.canReadLine()) {
         QString line = process.readLine();
         //this->appends(line);
@@ -208,15 +180,13 @@ int FilesModel::locate(QString s, bool useUserDB, bool ignoreCase, bool useRegex
     if (count == 0) {
         backing << "***** Nothing found :-( ";
         backing << "mlocate installed? No Database?";
+        backing << "";
         backing << "your search: ";
         backing.append(params);
         backing << stderr;
     }
-//backing.clear();
-//backing << "test.jpg" << "test2.jpg";
     this->lcount = count;
-    //this->appends(line);
-    return count;//stdout.length();
+    return count;
 }
 // für qml model dataModel
 QStringList FilesModel::getFileList() {
@@ -227,16 +197,54 @@ bool FilesModel::execXdgOpen(QString filename) {
     QProcess process;
     QStringList params;
     params << filename;
-    process.setWorkingDirectory("/home/nemo");
-    process.startDetached("/usr/bin/xdg-open",params);
-    return true;
+    //process.setWorkingDirectory("/home/nemo");
+    return process.startDetached("/usr/bin/xdg-open",params);
 }
-/*
+
 bool FilesModel::startFileBrowser(QString dir) {
+    QProcess process;
+    // to start browser with correct dir the HOME env Variable has to be set
+    /* thanks to matt https://stackoverflow.com/questions/28758421/qprocess-set-environment-variables-for-startdetached
+     As child process inherits the environment from the parent,
+        I think that the easiest workaround is to save/modify/restore own environment using qgetenv() and qputenv()
+        before and after QProcess::startDetached() call.*/
+    QFileInfo qfi(dir);
+    QString oldhome = "/home";
+    if (!qfi.isDir()) {
+        dir.truncate(dir.lastIndexOf("/"));
+    }
+    qfi.setFile(dir);
+    if (!qfi.isDir()) {
+        return false;
+    }
     dir.trimmed();
-    dir.truncate(dir.lastIndexOf("/"));
-    QProcessEnvironment qpe;
-    QString oldhome = qpe.value("HOME");
-    insert("HOME",dir);
-}*/
+    oldhome = qgetenv("HOME");
+    qputenv("HOME", QByteArray(dir.toUtf8()));
+   // qDebug() << "oldhome: " << oldhome << " newHome: " << qgetenv("HOME");
+    bool started = process.startDetached("/usr/bin/harbour-file-browser");
+    qputenv("HOME", QByteArray(oldhome.toUtf8()));
+    return started;
+}
+  /*  The following doesn't works because
+   startDetached is static, so doesn't use the env set by setProcessEnvironment :-(
+    QString env_variable;
+    QStringList paths_list;// = env.toStringList();
+    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+    paths_list = env.toStringList();
+    foreach( env_variable, paths_list )
+        qDebug() << env_variable;
+    //oldhome = env.value("HOME");
+    env.insert("HOME",dir);
+process.setProcessEnvironment(env);
+    qDebug() << "-------------";
+    paths_list = env.toStringList();
+    foreach( env_variable, paths_list )
+        qDebug() << env_variable;
+
+    paths_list = env.toStringList();
+    foreach( env_variable, paths_list )
+        qDebug() << env_variable;
+    process.setProgram("/usr/bin/harbour-file-browser");
+    process.startDetached("/usr/bin/harbour-file-browser");
+*/
 

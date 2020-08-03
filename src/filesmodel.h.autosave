@@ -3,22 +3,15 @@
 #include <QAbstractListModel>
 #include <QProcess>
 #include <QProcessEnvironment>
-
+#include <QFileInfo>
+#include <QDebug>
+#include <QtGlobal>
 class FilesModel : public QAbstractListModel
 {
     Q_OBJECT
 public:
     //// neuer constructor um obj in qml global zu machen
     FilesModel(QObject * p = nullptr);// : QAbstractListModel(p){};
-
-    /*{
-        //backing << "sea cow" << "platypus" << "axolotl" << "quokka" << "pitahui" << "jerboa";
-
-    }*/
-
-
-    //// alter constructor
-    ////explicit FilesModel(QObject *parent = NULL);
 
     virtual int rowCount(const QModelIndex&) const { return backing.size(); }
     virtual QVariant data(const QModelIndex &index, int role) const;
@@ -34,6 +27,7 @@ public:
     Q_INVOKABLE QStringList getFileList();
     Q_INVOKABLE void remove(const int i);
     Q_INVOKABLE bool execXdgOpen(QString filename);
+    Q_INVOKABLE bool startFileBrowser(QString dir);
     int lcount = 0;
     enum DemoRoles {
         NameRole = Qt::UserRole + 1,

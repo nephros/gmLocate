@@ -8,18 +8,12 @@ Page {
     SilicaListView {
         id: listView
         model: sharedfmodel.getFileList()
-
-        /*
-            FilesModel {
-            id: fmodel
-        }*/
         anchors.fill: parent
         header: PageHeader {
             title: qsTr("located files(Limit: 1000): " ) + sharedfmodel.getsMyCounter()
         }
         delegate: ListItem {
             id: listEntry
-
             //contentHeight:Theme.fontSizeSmall * 1.4
             Label {
                 width: parent.width - Theme.fontSizeSmall * 2
@@ -28,9 +22,6 @@ Page {
                 // modelData ist qml definition
                 text:  index + ": " + modelData  //qsTr("Item") + " " + index
                 color: listEntry.highlighted ? Theme.highlightColor : Theme.primaryColor
-                //font.pixelSize: Theme.fontSizeExtraSmall
-                //padding: Theme.paddingSmall
-                //height: contentHeight
             }
          /*   onClicked: {
                 sharedfmodel.swap2top(index)
