@@ -1,8 +1,6 @@
 
 
 #include "filesmodel.h"
-//QVector<QString>  FilesModel::backing;// = "";//<< "sea cow" << "platypus" << "axolotl" << "quokka" << "pitahui" << "jerboa";
-//int FilesModel::counter = 1;
 
 
 FilesModel::FilesModel(QObject *parent) :
@@ -10,10 +8,7 @@ FilesModel::FilesModel(QObject *parent) :
 {
     systemDB = "/var/cache/harbour-mlocate.db";
     userDB = "locateDB.db";
-    //   backing << "sea cow" << "platypus" << "axolotl" << "quokka" << "pitahui" << "jerboa";
-    //    counter++;
 }
-
 
 
 QHash<int, QByteArray> FilesModel::roleNames() const {
@@ -45,7 +40,6 @@ void FilesModel::activate(const int i) {
         return;
     }
     QString value = backing[i];
-
     // Remove the value from the old location.
     beginRemoveRows(QModelIndex(), i, i);
     backing.erase(backing.begin() + i);
@@ -66,10 +60,7 @@ void FilesModel::swap2top(const int i) {
     if(i < 1 || i >= backing.size()) {
         return;
     }
-    //  beginMoveRows(QModelIndex(), i, i,QModelIndex(),0);
     backing.move(i,0);
-    // endMoveRows();
-
 }
 QString FilesModel::diskFree() {
     QStringList args;
@@ -87,10 +78,7 @@ QString FilesModel::diskFree() {
         lines += process.readLine();
         //}
     }
-    //line.truncate(16);
-
     return lines;
-
 }
 
 QString FilesModel::updateDb(bool useUserDB, bool doUpdate) {
@@ -125,7 +113,7 @@ QString FilesModel::updateDb(bool useUserDB, bool doUpdate) {
     process.waitForFinished(1000);
     //QString stdout = process.readAllStandardOutput();
     while (process.canReadLine()) {
-        line += ": " + process.readLine();
+        line += "\n " + process.readLine();
         gotResult = true;
     }
     line.truncate(18);
@@ -135,7 +123,6 @@ QString FilesModel::updateDb(bool useUserDB, bool doUpdate) {
     } else {
         retline += line;
     }
-    //retline = process.workingDirectory();
     return retline;
 }
 int FilesModel::locate(QString s, bool useUserDB, bool ignoreCase, bool useRegex, bool exists, bool useAllPatterns  ) {
@@ -179,7 +166,7 @@ int FilesModel::locate(QString s, bool useUserDB, bool ignoreCase, bool useRegex
     }
     if (count == 0) {
         backing << "***** Nothing found :-( ";
-        backing << "mlocate installed? No Database?";
+        backing << "mlocate not installed? No Database?";
         backing << "";
         backing << "your search: ";
         backing.append(params);
@@ -196,6 +183,7 @@ QStringList FilesModel::getFileList() {
 bool FilesModel::execXdgOpen(QString filename) {
     QProcess process;
     QStringList params;
+    filename = filename.trimmed();
     params << filename;
     //process.setWorkingDirectory("/home/nemo");
     return process.startDetached("/usr/bin/xdg-open",params);
@@ -208,6 +196,7 @@ bool FilesModel::startFileBrowser(QString dir) {
      As child process inherits the environment from the parent,
         I think that the easiest workaround is to save/modify/restore own environment using qgetenv() and qputenv()
         before and after QProcess::startDetached() call.*/
+    dir = dir.trimmed();
     QFileInfo qfi(dir);
     QString oldhome = "/home";
     if (!qfi.isDir()) {
@@ -217,15 +206,15 @@ bool FilesModel::startFileBrowser(QString dir) {
     if (!qfi.isDir()) {
         return false;
     }
-    dir.trimmed();
+    qDebug() << "settinge ENV: " << dir;
     oldhome = qgetenv("HOME");
     qputenv("HOME", QByteArray(dir.toUtf8()));
-   // qDebug() << "oldhome: " << oldhome << " newHome: " << qgetenv("HOME");
+    // qDebug() << "oldhome: " << oldhome << " newHome: " << qgetenv("HOME");
     bool started = process.startDetached("/usr/bin/harbour-file-browser");
     qputenv("HOME", QByteArray(oldhome.toUtf8()));
     return started;
 }
-  /*  The following doesn't works because
+/*  The following doesn't works because
    startDetached is static, so doesn't use the env set by setProcessEnvironment :-(
     QString env_variable;
     QStringList paths_list;// = env.toStringList();

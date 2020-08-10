@@ -44,14 +44,14 @@ Page {
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: sharedfmodel.updateDb(false)
                 color: Theme.secondaryHighlightColor
-                font.pixelSize: Theme.fontSizeExtraSmall
+                font.pixelSize: Theme.fontSizeSmall
             }
             Label {
                 id: idDBUserAge
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: sharedfmodel.updateDb(true)
                 color: Theme.secondaryHighlightColor
-                font.pixelSize: Theme.fontSizeExtraSmall
+                font.pixelSize: Theme.fontSizeSmall
                 //margins: Theme.paddingLarge // wenns an kanten klebt
             }
 
@@ -81,13 +81,13 @@ Page {
                 id: matchAllPatternsSwitch
                 checked: true
                 text: "match all Patterns"
-                description: matchAllPatternsSwitch.checked ? "matching all Patterns" : "matching only one the Patterns"
+                description: matchAllPatternsSwitch.checked ? "matching all Patterns" : "matching one or more Patterns"
             }
             TextSwitch {
                 id: useRegexSwitch
                 checked: false
                 text: "use eRegex"
-                description: useRegexSwitch.checked ? "using extended regular expression" : "using glob pattern"
+                description: useRegexSwitch.checked ? "using extended regular expression" : "default"
             }
             TextSwitch {
                 id: existsSwitch
@@ -97,8 +97,8 @@ Page {
             }
             TextField {
                 id: file2find
-                placeholderText: "fillin file to find... (min. 3 chars!"
-                label: "fillin file to find... (min. 3 chars!)"
+                placeholderText: "fill in file to find... (min. 3 chars!)"
+                label: "fill in file to find... (min. 3 chars!)"
                 width: parent.width
                 anchors.horizontalCenter: parent.horizontalCenter
                 EnterKey.enabled: text.length > 2
