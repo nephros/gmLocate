@@ -3,9 +3,11 @@
 #include <QAbstractListModel>
 #include <QProcess>
 #include <QProcessEnvironment>
+#include <QStandardPaths>
 #include <QFileInfo>
 #include <QDebug>
 #include <QtGlobal>
+
 class FilesModel : public QAbstractListModel
 {
     Q_OBJECT
@@ -35,6 +37,7 @@ public:
 private:
     //QVector<QString> backing;
     QStringList backing;
+    QString homeDir;
     QString systemDB;
     QString userDB;
 };

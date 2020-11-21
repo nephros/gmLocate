@@ -7,6 +7,14 @@ CoverBackground {
         anchors.centerIn: parent
         text: qsTr("gmLocate")
     }
+    Image {
+      anchors.centerIn: parent
+      source: "image://theme/icon-cover-search"
+      width: parent.width / 2
+      height: parent.height / 2
+      fillMode: Image.PreserveAspectFit
+      opacity: 0.2
+    }
     CoverActionList {
         id: coverAction
         CoverAction {

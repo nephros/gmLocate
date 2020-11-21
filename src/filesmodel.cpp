@@ -7,7 +7,15 @@ FilesModel::FilesModel(QObject *parent) :
     QAbstractListModel(parent)
 {
     systemDB = "/var/cache/harbour-mlocate.db";
-    userDB = "locateDB.db";
+    homeDir = QStandardPaths::writableLocation(QStandardPaths::HomeLocation);
+    /*
+     * note: CacheLocation expands to '~/.cache/<<AppName>>/<<AppName>>' on
+     * SailfishOS, a historical peculiarity.
+     * Probably because organizationName and applicationName are set to the same
+     *
+     * let's use the bare ~/.cache for this, harbour-mlocate >= 0.26-9 uses the same
+    */
+    userDB = QStandardPaths::writableLocation(QStandardPaths::GenericCacheLocation).append("/locateDB.db");
 }
 
 
@@ -85,19 +93,19 @@ QString FilesModel::updateDb(bool useUserDB, bool doUpdate) {
     //args << "-c" <<  "%y" << "/var/cache/harbour-mlocate.db";
     //updatedb -o locateDB.db
     QProcess process;
-    process.setWorkingDirectory("/home/nemo");
+    process.setWorkingDirectory(homeDir);
     QString stderr;
     QStringList args;
     bool gotResult = false;
     QString retline;
     QString line;
     if (doUpdate) {
-        // process.setWorkingDirectory("/home/nemo");
+        args << "updatedb";
         if (useUserDB) {
-            args << "-o" << userDB;
+            args << "-l" << "0" << "-U" << homeDir << "-o" << userDB;
         }
-        process.start("updatedb",args);// . -name \"" + s + "*\"");
-        process.waitForFinished(30000); // will wait forever(-1) or msec until finished
+        process.start("/usr/bin/env",args);
+        process.waitForFinished(100000); // will wait forever(-1) or msec until finished
     }
     args.clear();
     args  << "-c" <<  "%y";
@@ -150,7 +158,7 @@ int FilesModel::locate(QString s, bool useUserDB, bool ignoreCase, bool useRegex
     s.simplified();
     params.append(s.split(' '));
     // process.setArguments(params);
-    process.setWorkingDirectory("/home/nemo");
+    process.setWorkingDirectory(homeDir);
     process.start("/usr/bin/locate",params);// . -name \"" + s + "*\"");
     process.waitForFinished(-1); // will wait forever(-1) or msec until finished
 
@@ -185,7 +193,7 @@ bool FilesModel::execXdgOpen(QString filename) {
     QStringList params;
     filename = filename.trimmed();
     params << filename;
-    //process.setWorkingDirectory("/home/nemo");
+    process.setWorkingDirectory(homeDir);
     return process.startDetached("/usr/bin/xdg-open",params);
 }
 
@@ -208,7 +216,7 @@ bool FilesModel::startFileBrowser(QString dir) {
     }
     qDebug() << "settinge ENV: " << dir;
     oldhome = qgetenv("HOME");
-    qputenv("HOME", QByteArray(dir.toUtf8()));
+    qputenv("HOME", QByteArray(homeDir.toUtf8()));
     // qDebug() << "oldhome: " << oldhome << " newHome: " << qgetenv("HOME");
     bool started = process.startDetached("/usr/bin/harbour-file-browser");
     qputenv("HOME", QByteArray(oldhome.toUtf8()));
