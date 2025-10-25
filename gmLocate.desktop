@@ -14,5 +14,5 @@ Name[de]=gmLocate
 [X-Sailjail]
 ApplicationName=gmLocate
 OrganizationName=net.openrepos.sh6668
-Permissions=UserData
+Permissions=UserDirs
 
