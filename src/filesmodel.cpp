@@ -6,7 +6,15 @@
 FilesModel::FilesModel(QObject *parent) :
     QAbstractListModel(parent)
 {
-    systemDB = "/var/cache/harbour-mlocate.db";
+    if (QFile::exists(QStringLiteral("/var/lib/plocate/plocate.db"))) {
+        systemDB = QStringLiteral("/var/lib/plocate/plocate.db");
+    } else if (QFile::exists(QStringLiteral("/var/cache/mlocate.db"))) {
+        systemDB = QStringLiteral("/var/cache/mlocate.db");
+    } else {
+        //legacy fallback
+        systemDB = QStringLiteral("/var/cache/harbour-mlocate.db");
+    }
+
     homeDir = QStandardPaths::writableLocation(QStandardPaths::HomeLocation);
     /*
      * note: CacheLocation expands to '~/.cache/<<AppName>>/<<AppName>>' on
