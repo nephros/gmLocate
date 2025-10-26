@@ -120,9 +120,9 @@ void FilesModel::updateDb(bool useUserDB) {
     connect(&process, QProcess::finished, this, [=](int status, QProcess::ExitStatus exitStatus){
       if (exitStatus == QProcess::NormalExit) {
           if (useUserDB) {
-              emit lastUpdatedUserChanged(lastUpdatedUser);
+              emit lastUpdatedUserChanged(QDateTime::currentDateTime());
           } else {
-              emit lastUpdatedSysChanged(lastUpdatedSys);
+              emit lastUpdatedSysChanged(QDateTime::currentDateTime());
           }
       }
       emit processFinished(status);
