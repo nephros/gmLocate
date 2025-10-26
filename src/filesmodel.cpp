@@ -24,6 +24,12 @@ FilesModel::FilesModel(QObject *parent) :
      * let's use the bare ~/.cache for this, harbour-mlocate >= 0.26-9 uses the same
     */
     userDB = QStandardPaths::writableLocation(QStandardPaths::GenericCacheLocation).append("/locateDB.db");
+    qInfo() << "Using systemd DB at: " << systemDB;
+    if (QFile::exists(userDB) {
+        qInfo() << "Using user DB at: " << userDB;
+    } else {
+        qInfo() << "No user DB found at: " << userDB;
+    }
 }
 
 
@@ -220,7 +226,7 @@ bool FilesModel::startFileBrowser(QString dir) {
     if (!qfi.isDir()) {
         return false;
     }
-    qDebug() << "settinge ENV: " << dir;
+    qDebug() << "setting ENV: " << dir;
     oldhome = qgetenv("HOME");
     qputenv("HOME", QByteArray(homeDir.toUtf8()));
     // qDebug() << "oldhome: " << oldhome << " newHome: " << qgetenv("HOME");
