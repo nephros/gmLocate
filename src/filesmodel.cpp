@@ -117,7 +117,7 @@ void FilesModel::updateDb(bool useUserDB) {
     }
     process.startDetached("/usr/bin/env",args);
     //process.waitForFinished(100000); // will wait forever(-1) or msec until finished
-    connect(&process, QProcess::finished, this, [=](int status, QProcess::ExitStatus exitStatus){
+    QObject::connect(&process, QProcess::finished, this, [=](int status, QProcess::ExitStatus exitStatus){
       if (exitStatus == QProcess::NormalExit) {
           if (useUserDB) {
               emit lastUpdatedUserChanged(QDateTime::currentDateTime());
