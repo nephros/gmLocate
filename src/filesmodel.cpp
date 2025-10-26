@@ -108,9 +108,7 @@ void FilesModel::updateDb(bool useUserDB) {
     //updatedb -o locateDB.db
     QProcess process;
     process.setWorkingDirectory(homeDir);
-    QString stderr;
     QStringList args;
-    bool gotResult = false;
     args << "updatedb";
     if (useUserDB) {
         args << "-U" << homeDir << "-o" << userDB;
@@ -136,9 +134,9 @@ QDateTime FilesModel::getLastUpdatedSys()
 }
 
 QDateTime FilesModel::getLastUpdatedUser()
+{
     QFileInfo fi(userDB);
     return fi.lastModified();
-{
 }
 
 int FilesModel::locate(QString s, bool useUserDB, bool ignoreCase, bool useRegex, bool exists, bool useAllPatterns  ) {
