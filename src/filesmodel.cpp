@@ -126,7 +126,7 @@ void FilesModel::updateDb(bool useUserDB) {
             emit processFinished(status);
         }
     );
-    process.startCommand("/usr/bin/env",args);
+    process.start("/usr/bin/env",args);
 }
 
 QDateTime FilesModel::getLastUpdatedSys()
