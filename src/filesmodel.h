@@ -26,7 +26,7 @@ public:
     Q_INVOKABLE QString diskFree();
     Q_INVOKABLE int getsMyCounter();
     Q_INVOKABLE int locate(QString s, bool useUserDB, bool ignoreCase , bool useRegex, bool exists, bool useAllPatterns);
-    Q_INVOKABLE void updateDb(bool useUserDB, bool doUpdate = false);
+    Q_INVOKABLE void updateDb(bool useUserDB);
     Q_INVOKABLE QStringList getFileList();
     Q_INVOKABLE void remove(const int i);
     Q_INVOKABLE bool execXdgOpen(QString filename);

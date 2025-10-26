@@ -103,7 +103,7 @@ QString FilesModel::diskFree() {
     return lines;
 }
 
-void FilesModel::updateDb(bool useUserDB, bool doUpdate) {
+void FilesModel::updateDb(bool useUserDB) {
     //args << "-c" <<  "%y" << "/var/cache/harbour-mlocate.db";
     //updatedb -o locateDB.db
     QProcess process;
@@ -111,26 +111,22 @@ void FilesModel::updateDb(bool useUserDB, bool doUpdate) {
     QString stderr;
     QStringList args;
     bool gotResult = false;
-    QString retline;
-    QString line;
-    if (doUpdate) {
-        args << "updatedb";
-        if (useUserDB) {
-            args << "-U" << homeDir << "-o" << userDB;
-        }
-        process.startDetached("/usr/bin/env",args);
-        //process.waitForFinished(100000); // will wait forever(-1) or msec until finished
-        connect(&process, QProcess::finished, this, [this](int status, QProcess::ExitStatus exitStatus){
-          if (exitStatus == QProcess::Success) {
-              if (useUserDB) {
-                  emit lastUpdatedUserChanged(lastUpdatedUser);
-              } else {
-                  emit lastUpdatedSysChanged(lastUpdatedSys);
-              }
-          }
-          emit processFinished(status);
-        });
+    args << "updatedb";
+    if (useUserDB) {
+        args << "-U" << homeDir << "-o" << userDB;
     }
+    process.startDetached("/usr/bin/env",args);
+    //process.waitForFinished(100000); // will wait forever(-1) or msec until finished
+    connect(&process, QProcess::finished, this, [this](int status, QProcess::ExitStatus exitStatus){
+      if (exitStatus == QProcess::NormalExit) {
+          if (useUserDB) {
+              emit lastUpdatedUserChanged(lastUpdatedUser);
+          } else {
+              emit lastUpdatedSysChanged(lastUpdatedSys);
+          }
+      }
+      emit processFinished(status);
+    });
 }
 
 QDateTime FilesModel::getLastUpdatedSys()

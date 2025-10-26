@@ -61,7 +61,7 @@ Page {
                     text: "update User DB"
                     //anchors.horizontalCenter: parent.horizontalCenter
                     onClicked: {
-                        sharedfmodel.updateDb(true, true)
+                        sharedfmodel.updateDb(true)
                     }
                 }
             }
