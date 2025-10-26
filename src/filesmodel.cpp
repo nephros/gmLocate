@@ -33,12 +33,15 @@ FilesModel::FilesModel(QObject *parent) :
     } else {
         qInfo() << "No user DB found at: " << userDB;
     }
-    connect(watcher, QFileSystemWatcher::fileChanged, [=](const QString path) {
+    connect(watcher, &QFileSystemWatcher::fileChanged, [=](const QString path) {
         QFileInfo fi(path);
         if (path == systemDB)
             emit lastUpdatedSysChanged(fi.lastModified());
         if (path == userDB)
             emit lastUpdatedUserChanged(fi.lastModified());
+        // re add the path if the file was deleted and recreated:
+         if(!watcher->files().contains(path) && QFile::exists(path))
+             watcher->addPath(path);
     });
 }
 
