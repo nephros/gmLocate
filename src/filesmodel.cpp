@@ -25,7 +25,7 @@ FilesModel::FilesModel(QObject *parent) :
     */
     userDB = QStandardPaths::writableLocation(QStandardPaths::GenericCacheLocation).append("/locateDB.db");
     qInfo() << "Using systemd DB at: " << systemDB;
-    if (QFile::exists(userDB) {
+    if (QFile::exists(userDB)) {
         qInfo() << "Using user DB at: " << userDB;
     } else {
         qInfo() << "No user DB found at: " << userDB;

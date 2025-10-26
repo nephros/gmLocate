@@ -42,14 +42,14 @@ Page {
             Label {
                 id: idDBSystemAge
                 anchors.horizontalCenter: parent.horizontalCenter
-                text: sharedfmodel.updateDb(false)
+                text: qsTr("Last update: ") +  sharedfmodel.lastUpdatedSys;
                 color: Theme.secondaryHighlightColor
                 font.pixelSize: Theme.fontSizeSmall
             }
             Label {
                 id: idDBUserAge
                 anchors.horizontalCenter: parent.horizontalCenter
-                text: sharedfmodel.updateDb(true)
+                text: qsTr("Last update: ") + sharedfmodel.lastUpdatedUser;
                 color: Theme.secondaryHighlightColor
                 font.pixelSize: Theme.fontSizeSmall
                 //margins: Theme.paddingLarge // wenns an kanten klebt
@@ -61,7 +61,7 @@ Page {
                     text: "update User DB"
                     //anchors.horizontalCenter: parent.horizontalCenter
                     onClicked: {
-                        idDBUserAge.text = sharedfmodel.updateDb(true, true)
+                        sharedfmodel.updateDb(true, true)
                     }
                 }
             }
