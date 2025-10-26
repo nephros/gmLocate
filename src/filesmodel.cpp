@@ -113,18 +113,20 @@ void FilesModel::updateDb(bool useUserDB) {
     if (useUserDB) {
         args << "-U" << homeDir << "-o" << userDB;
     }
-    process.startDetached("/usr/bin/env",args);
     //process.waitForFinished(100000); // will wait forever(-1) or msec until finished
-    QObject::connect(&process, QProcess::finished, this, [=](int status, QProcess::ExitStatus exitStatus){
-      if (exitStatus == QProcess::NormalExit) {
-          if (useUserDB) {
-              emit lastUpdatedUserChanged(QDateTime::currentDateTime());
-          } else {
-              emit lastUpdatedSysChanged(QDateTime::currentDateTime());
-          }
-      }
-      emit processFinished(status);
-    });
+    connect(&process, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished),
+        [=](int status, QProcess::ExitStatus exitStatus){
+            if (exitStatus == QProcess::NormalExit) {
+                if (useUserDB) {
+                    emit lastUpdatedUserChanged(QDateTime::currentDateTime());
+                } else {
+                    emit lastUpdatedSysChanged(QDateTime::currentDateTime());
+                }
+            }
+            emit processFinished(status);
+        }
+    );
+    process.startCommand("/usr/bin/env",args);
 }
 
 QDateTime FilesModel::getLastUpdatedSys()
