@@ -106,15 +106,15 @@ QString FilesModel::diskFree() {
 void FilesModel::updateDb(bool useUserDB) {
     //args << "-c" <<  "%y" << "/var/cache/harbour-mlocate.db";
     //updatedb -o locateDB.db
-    QProcess process;
-    process.setWorkingDirectory(homeDir);
+    QProcess *process = new QProcess();
+    process->setWorkingDirectory(homeDir);
     QStringList args;
     args << "updatedb";
     if (useUserDB) {
         args << "-U" << homeDir << "-o" << userDB;
     }
     //process.waitForFinished(100000); // will wait forever(-1) or msec until finished
-    connect(&process, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished),
+    connect(process, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished),
         [=](int status, QProcess::ExitStatus exitStatus){
             if (exitStatus == QProcess::NormalExit) {
                 if (useUserDB) {
@@ -126,7 +126,7 @@ void FilesModel::updateDb(bool useUserDB) {
             emit processFinished(status);
         }
     );
-    process.start("/usr/bin/env",args);
+    process->start("/usr/bin/env",args);
 }
 
 QDateTime FilesModel::getLastUpdatedSys()
