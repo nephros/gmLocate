@@ -97,7 +97,7 @@ QString FilesModel::diskFree() {
     return lines;
 }
 
-QString FilesModel::updateDb(bool useUserDB, bool doUpdate) {
+void FilesModel::updateDb(bool useUserDB, bool doUpdate) {
     //args << "-c" <<  "%y" << "/var/cache/harbour-mlocate.db";
     //updatedb -o locateDB.db
     QProcess process;
@@ -110,37 +110,35 @@ QString FilesModel::updateDb(bool useUserDB, bool doUpdate) {
     if (doUpdate) {
         args << "updatedb";
         if (useUserDB) {
-            args << "-l" << "0" << "-U" << homeDir << "-o" << userDB;
+            args << "-U" << homeDir << "-o" << userDB;
         }
-        process.start("/usr/bin/env",args);
-        process.waitForFinished(100000); // will wait forever(-1) or msec until finished
+        process.startDetached("/usr/bin/env",args);
+        //process.waitForFinished(100000); // will wait forever(-1) or msec until finished
+        process::connect(&process, QProcess::finished, this, [this](int status, QProcess::ExitStatus exitStatus){
+          if (exitStatus == QProcess::Success) {
+              if (useUserDB) {
+                  emit lastUpdatedUserChanged(lastUpdatedUser);
+              } else {
+                  emit lastUpdatedSysChanged(lastUpdatedSys);
+              }
+          }
+          emit processFinished(status);
+        });
     }
-    args.clear();
-    args  << "-c" <<  "%y";
-    if (useUserDB) {
-        args  << userDB;
-        retline = "Last updateDB USER";
-    } else {
-        args  << systemDB;
-        retline = "Last updateDB SYSTEM";
-    }
-    //args  << "-c" <<  "%y" << "/var/cache/pk-zypp-cache";
-    process.start("/usr/bin/stat",args);
-    process.waitForFinished(1000);
-    //QString stdout = process.readAllStandardOutput();
-    while (process.canReadLine()) {
-        line += "\n " + process.readLine();
-        gotResult = true;
-    }
-    line.truncate(18);
-    if (!gotResult) {
-        retline = process.readAllStandardError();
-        retline.remove(0, 26);
-    } else {
-        retline += line;
-    }
-    return retline;
 }
+
+QDateTime FilesModel::getLastUpdatedSys()
+{
+    QFileInfo fi(systemDB);
+    return fi.lastModified();
+}
+
+QDateTime FilesModel::getLastUpdatedUser()
+    QFileInfo fi(userDB);
+    return fi.lastModified();
+{
+}
+
 int FilesModel::locate(QString s, bool useUserDB, bool ignoreCase, bool useRegex, bool exists, bool useAllPatterns  ) {
     //locate -d locateDB.db
     QProcess process;

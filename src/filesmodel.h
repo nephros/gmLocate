@@ -5,6 +5,7 @@
 #include <QProcessEnvironment>
 #include <QStandardPaths>
 #include <QFileInfo>
+#include <QDateTime>
 #include <QDebug>
 #include <QtGlobal>
 
@@ -25,15 +26,24 @@ public:
     Q_INVOKABLE QString diskFree();
     Q_INVOKABLE int getsMyCounter();
     Q_INVOKABLE int locate(QString s, bool useUserDB, bool ignoreCase , bool useRegex, bool exists, bool useAllPatterns);
-    Q_INVOKABLE QString updateDb(bool useUserDB, bool doUpdate = false);
+    Q_INVOKABLE void updateDb(bool useUserDB, bool doUpdate = false);
     Q_INVOKABLE QStringList getFileList();
     Q_INVOKABLE void remove(const int i);
     Q_INVOKABLE bool execXdgOpen(QString filename);
     Q_INVOKABLE bool startFileBrowser(QString dir);
+    Q_PROPERTY (QDateTime lastUpdatedSys  READ getLastUpdatedSys  NOTIFY lastUpdatedSysChanged);
+    Q_PROPERTY (QDateTime lastUpdatedUser READ getLastUpdatedUser  NOTIFY lastUpdatedUserChanged);
     int lcount = 0;
     enum DemoRoles {
         NameRole = Qt::UserRole + 1,
     };
+    QDateTime getLastUpdatedSys();
+    QDateTime getLastUpdatedUser();
+
+signals:
+    void processFinished(int code);
+    void lastUpdatedSysChanged(QDateTime updated);
+    void lastUpdatedUserChanged(QDateTime updated);
 private:
     //QVector<QString> backing;
     QStringList backing;
