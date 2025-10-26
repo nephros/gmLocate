@@ -5,6 +5,7 @@
 #include <QProcessEnvironment>
 #include <QStandardPaths>
 #include <QFileInfo>
+#include <QFileSystemWatcher>
 #include <QDateTime>
 #include <QDebug>
 #include <QtGlobal>
@@ -50,5 +51,6 @@ private:
     QString homeDir;
     QString systemDB;
     QString userDB;
+    QFileSystemWatcher *watcher;
 };
 #endif // FILESMODEL_H

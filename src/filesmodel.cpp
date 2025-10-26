@@ -6,6 +6,7 @@
 FilesModel::FilesModel(QObject *parent) :
     QAbstractListModel(parent)
 {
+    watcher = new QFileSystemWatcher();
     if (QFile::exists(QStringLiteral("/var/lib/plocate/plocate.db"))) {
         systemDB = QStringLiteral("/var/lib/plocate/plocate.db");
     } else if (QFile::exists(QStringLiteral("/var/cache/mlocate.db"))) {
@@ -14,6 +15,7 @@ FilesModel::FilesModel(QObject *parent) :
         //legacy fallback
         systemDB = QStringLiteral("/var/cache/harbour-mlocate.db");
     }
+    watcher->addPath(systemDB);
 
     homeDir = QStandardPaths::writableLocation(QStandardPaths::HomeLocation);
     /*
@@ -27,9 +29,17 @@ FilesModel::FilesModel(QObject *parent) :
     qInfo() << "Using systemd DB at: " << systemDB;
     if (QFile::exists(userDB)) {
         qInfo() << "Using user DB at: " << userDB;
+        watcher->addPath(userDB);
     } else {
         qInfo() << "No user DB found at: " << userDB;
     }
+    connect(watcher, QFileSystemWatcher::fileChanged, [=](const QString path) {
+        QFileInfo fi(path);
+        if (path == systemDB)
+            emit lastUpdatedSysChanged(fi.lastModified());
+        if (path == userDB)
+            emit lastUpdatedUserChanged(fi.lastModified());
+    });
 }
 
 
