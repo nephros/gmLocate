@@ -39,19 +39,21 @@ Page {
                 padding: Theme.paddingSmall
 
             }*/
-            Label {
+            SectionHeader { text: qsTr("System DB") }
+            DetailItem {
                 id: idDBSystemAge
                 anchors.horizontalCenter: parent.horizontalCenter
-                text: qsTr("Last update: ") +  sharedfmodel.lastUpdatedSys;
-                color: Theme.secondaryHighlightColor
-                font.pixelSize: Theme.fontSizeSmall
+                label: qsTr("Last update"); value: sharedfmodel.lastUpdatedSys.toLocaleString();
+                //color: Theme.secondaryHighlightColor
+                //font.pixelSize: Theme.fontSizeSmall
             }
-            Label {
+            SectionHeader { text: qsTr("User DB") }
+            DetailItem {
                 id: idDBUserAge
                 anchors.horizontalCenter: parent.horizontalCenter
-                text: qsTr("Last update: ") + sharedfmodel.lastUpdatedUser;
-                color: Theme.secondaryHighlightColor
-                font.pixelSize: Theme.fontSizeSmall
+                label: qsTr("Last update"); value: sharedfmodel.lastUpdatedUser.toLocaleString();
+                //color: Theme.secondaryHighlightColor
+                //font.pixelSize: Theme.fontSizeSmall
                 //margins: Theme.paddingLarge // wenns an kanten klebt
             }
 
